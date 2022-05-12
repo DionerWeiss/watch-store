@@ -21,6 +21,22 @@ describe('Name of the group', () => {
     server.shutdown();
   });
 
+  const getProducts = (quantity = 10, overrides = []) => {
+    let overrideList = [];
+
+    if (overrides.length > 0) {
+      overrideList = overrides.map((override) =>
+        server.create('product', override)
+      );
+    }
+
+    const products = [
+      ...server.createList('product', quantity),
+      ...overrideList,
+    ];
+    return products;
+  };
+
   it('should mount the component', () => {
     const wrapper = mount(ProductList);
     expect(wrapper.vm).toBeDefined();
@@ -43,7 +59,7 @@ describe('Name of the group', () => {
   });
 
   it('should mount the ProductCard component 10 times', async () => {
-    const products = server.createList('product', 10);
+    const products = getProducts();
     axios.get.mockReturnValue(Promise.resolve({ data: { products } }));
 
     const wrapper = mount(ProductList, {
@@ -73,15 +89,14 @@ describe('Name of the group', () => {
   });
 
   it('should filter the product list when a search is performed', async () => {
-    const products = [
-      ...server.createList('product', 10),
-      server.create('product', {
+    const products = getProducts(10, [
+      {
         title: 'Meu relógio amado',
-      }),
-      server.create('product', {
+      },
+      {
         title: 'Meu outro relógio estimado',
-      }),
-    ];
+      },
+    ]);
 
     axios.get.mockReturnValue(Promise.resolve({ data: { products } }));
 
@@ -103,12 +118,11 @@ describe('Name of the group', () => {
   });
 
   it('should filter the product list when a search is empty', async () => {
-    const products = [
-      ...server.createList('product', 10),
-      server.create('product', {
+    const products = getProducts(10, [
+      {
         title: 'Meu relógio amado',
-      }),
-    ];
+      },
+    ]);
 
     axios.get.mockReturnValue(Promise.resolve({ data: { products } }));
 
