@@ -19,6 +19,7 @@ describe('Name of the group', () => {
 
   afterEach(() => {
     server.shutdown();
+    jest.clearAllMocks();
   });
 
   const getProducts = (quantity = 10, overrides = []) => {
@@ -37,59 +38,76 @@ describe('Name of the group', () => {
     return products;
   };
 
-  it('should mount the component', () => {
-    const wrapper = mount(ProductList);
-    expect(wrapper.vm).toBeDefined();
-  });
+  const mountProductList = async (
+    quantity = 10,
+    overrides = [],
+    shouldReject = false
+  ) => {
+    const products = getProducts(quantity, overrides);
 
-  it('should mount the Search component as a child', () => {
-    const wrapper = mount(ProductList);
-    expect(wrapper.findComponent(Search)).toBeDefined();
-  });
+    if (shouldReject) {
+      axios.get.mockReturnValue(Promise.reject(new Error('any_error')));
+    } else {
+      axios.get.mockReturnValue(Promise.resolve({ data: { products } }));
+    }
 
-  it('should call axios.get on component mount', () => {
-    mount(ProductList, {
+    const wrapper = mount(ProductList, {
       mocks: {
         $axios: axios,
       },
     });
+
+    await Vue.nextTick();
+
+    return { wrapper, products };
+  };
+
+  it('should mount the component', async () => {
+    const { wrapper } = await mountProductList();
+
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it('should mount the Search component as a child', async () => {
+    const { wrapper } = await mountProductList();
+
+    expect(wrapper.findComponent(Search)).toBeDefined();
+  });
+
+  it('should call axios.get on component mount', async () => {
+    await mountProductList();
 
     expect(axios.get).toBeCalledTimes(1);
     expect(axios.get).toBeCalledWith('/api/products');
   });
 
   it('should mount the ProductCard component 10 times', async () => {
-    const products = getProducts();
-    axios.get.mockReturnValue(Promise.resolve({ data: { products } }));
-
-    const wrapper = mount(ProductList, {
-      mocks: {
-        $axios: axios,
-      },
-    });
-
-    await Vue.nextTick();
+    const { wrapper } = await mountProductList();
 
     const cards = wrapper.findAllComponents(ProductCard);
+
     expect(cards).toHaveLength(10);
   });
 
   it('should display the error message when Promise rejects', async () => {
-    axios.get.mockReturnValue(Promise.reject(new Error('any_error')));
-
-    const wrapper = mount(ProductList, {
-      mocks: {
-        $axios: axios,
-      },
-    });
-
-    await Vue.nextTick();
+    const { wrapper } = await mountProductList(
+      10,
+      [
+        {
+          title: 'Meu relógio amado',
+        },
+        {
+          title: 'Meu outro relógio estimado',
+        },
+      ],
+      true
+    );
 
     expect(wrapper.text()).toContain('Problemas ao carregar a lista!');
   });
 
   it('should filter the product list when a search is performed', async () => {
-    const products = getProducts(10, [
+    const { wrapper } = await mountProductList(10, [
       {
         title: 'Meu relógio amado',
       },
@@ -97,16 +115,6 @@ describe('Name of the group', () => {
         title: 'Meu outro relógio estimado',
       },
     ]);
-
-    axios.get.mockReturnValue(Promise.resolve({ data: { products } }));
-
-    const wrapper = mount(ProductList, {
-      mocks: {
-        $axios: axios,
-      },
-    });
-
-    await Vue.nextTick();
 
     const search = wrapper.findComponent(Search);
     search.find('input[type="search"]').setValue('relógio');
@@ -118,21 +126,11 @@ describe('Name of the group', () => {
   });
 
   it('should filter the product list when a search is empty', async () => {
-    const products = getProducts(10, [
+    const { wrapper } = await mountProductList(10, [
       {
         title: 'Meu relógio amado',
       },
     ]);
-
-    axios.get.mockReturnValue(Promise.resolve({ data: { products } }));
-
-    const wrapper = mount(ProductList, {
-      mocks: {
-        $axios: axios,
-      },
-    });
-
-    await Vue.nextTick();
 
     const search = wrapper.findComponent(Search);
     search.find('input[type="search"]').setValue('relógio');
