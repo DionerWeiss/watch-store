@@ -74,4 +74,14 @@ describe('CartItem', () => {
     await button.trigger('click');
     expect(quantity.text()).toContain('0');
   });
+
+  it('should not go bellow zero when button - is repeatedly clicked', async () => {
+    const { wrapper } = mountCartItem(server);
+    const quantity = wrapper.find('[data-testid="quantity"]');
+    const button = wrapper.find('[data-testid="-"]');
+
+    await button.trigger('click');
+    await button.trigger('click');
+    expect(quantity.text()).toContain('0');
+  });
 });
