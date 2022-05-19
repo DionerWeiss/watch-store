@@ -7,7 +7,7 @@
         alt=""
       />
       <div class="mx-3">
-        <h3 class="text-sm text-gray-600">Mac Book Pro</h3>
+        <h3 class="text-sm text-gray-600">{{ product.title }}</h3>
         <div class="flex items-center mt-2">
           <button class="text-gray-500 focus:outline-none focus:text-gray-600">
             <svg
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <span class="text-gray-600">20$</span>
+    <span class="text-gray-600">${{ product.price }}</span>
   </div>
 </template>
 
