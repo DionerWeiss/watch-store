@@ -9,7 +9,11 @@
       <div class="mx-3">
         <h3 class="text-sm text-gray-600">{{ product.title }}</h3>
         <div class="flex items-center mt-2">
-          <button class="text-gray-500 focus:outline-none focus:text-gray-600">
+          <button
+            class="text-gray-500 focus:outline-none focus:text-gray-600"
+            data-testid="+"
+            @click="quantity++"
+          >
             <svg
               class="h-5 w-5"
               fill="none"
@@ -22,8 +26,14 @@
               <path d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </button>
-          <span class="text-gray-700 mx-2">2</span>
-          <button class="text-gray-500 focus:outline-none focus:text-gray-600">
+          <span class="text-gray-700 mx-2" data-testid="quantity">{{
+            quantity
+          }}</span>
+          <button
+            class="text-gray-500 focus:outline-none focus:text-gray-600"
+            data-testid="-"
+            @click="quantity--"
+          >
             <svg
               class="h-5 w-5"
               fill="none"
@@ -53,6 +63,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      quantity: 1,
+    };
   },
 };
 </script>
