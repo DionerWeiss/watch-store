@@ -45,4 +45,33 @@ describe('CartItem', () => {
     expect(content).toContain(title);
     expect(content).toContain(price);
   });
+
+  it('should display quantity 1 when product is first displayed', () => {
+    const { wrapper } = mountCartItem(server);
+    const quantity = wrapper.find('[data-testid="quantity"]');
+
+    expect(quantity.text()).toContain('1');
+  });
+
+  it('should increaase quantity when + button gets clicked', async () => {
+    const { wrapper } = mountCartItem(server);
+    const quantity = wrapper.find('[data-testid="quantity"]');
+    const button = wrapper.find('[data-testid="+"]');
+
+    await button.trigger('click');
+    expect(quantity.text()).toContain('2');
+    await button.trigger('click');
+    expect(quantity.text()).toContain('3');
+    await button.trigger('click');
+    expect(quantity.text()).toContain('4');
+  });
+
+  it('should decreaase quantity when - button gets clicked', async () => {
+    const { wrapper } = mountCartItem(server);
+    const quantity = wrapper.find('[data-testid="quantity"]');
+    const button = wrapper.find('[data-testid="-"]');
+
+    await button.trigger('click');
+    expect(quantity.text()).toContain('0');
+  });
 });
