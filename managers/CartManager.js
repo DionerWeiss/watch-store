@@ -12,14 +12,18 @@ export class CartManager {
     this.state = Vue.observable(initialState);
   }
 
+  getState() {
+    return this.state;
+  }
+
   open() {
     this.state.open = true;
-    return this.state;
+    return this.getState();
   }
 
   close() {
     this.state.open = false;
-    return this.state;
+    return this.getState();
   }
 
   productIsInTheCart(product) {
@@ -35,7 +39,7 @@ export class CartManager {
       this.state.items.push(product);
     }
 
-    return this.state;
+    return this.getState();
   }
 
   removeProduct(productId) {
