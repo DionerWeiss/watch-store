@@ -21,4 +21,16 @@ export class CartManager {
     this.state.open = false;
     return this.state;
   }
+
+  productIsInTheCart(product) {
+    return !!this.state.items.find(({ id }) => id === product.id);
+  }
+
+  addProduct(product) {
+    if (!this.productIsInTheCart(product)) {
+      this.state.items.push(product);
+    }
+
+    return this.state;
+  }
 }
