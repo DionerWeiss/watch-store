@@ -26,6 +26,10 @@ export class CartManager {
     return !!this.state.items.find(({ id }) => id === product.id);
   }
 
+  hasProducts() {
+    return this.state.items.length > 0;
+  }
+
   addProduct(product) {
     if (!this.productIsInTheCart(product)) {
       this.state.items.push(product);
@@ -44,6 +48,13 @@ export class CartManager {
 
   clearProducts() {
     this.state.items = [];
+
+    return this.state;
+  }
+
+  clearCart() {
+    this.clearProducts();
+    this.close();
 
     return this.state;
   }
