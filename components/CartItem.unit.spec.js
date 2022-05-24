@@ -2,8 +2,10 @@ import { mount } from '@vue/test-utils';
 import { makeServer } from '@/miragejs/server';
 
 import CartItem from '@/components/CartItem';
+import { CartManager } from '@/managers/CartManager';
 
 const mountCartItem = (server) => {
+  const cartManager = new CartManager();
   const product = server.create('product', {
     title: 'Lindo relógio',
     price: '22.33',
@@ -13,9 +15,12 @@ const mountCartItem = (server) => {
     propsData: {
       product,
     },
+    mocks: {
+      $cart: cartManager,
+    },
   });
 
-  return { wrapper, product };
+  return { wrapper, product, cartManager };
 };
 
 describe('CartItem', () => {
@@ -83,5 +88,12 @@ describe('CartItem', () => {
     await button.trigger('click');
     await button.trigger('click');
     expect(quantity.text()).toContain('0');
+  });
+
+  it('should display a button to remove item from cart', () => {
+    const { wrapper } = mountCartItem(server);
+    const button = wrapper.find('[data-testid="remove-button"]');
+
+    expect(button.exists()).toBe(true);
   });
 });
