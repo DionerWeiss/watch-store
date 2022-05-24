@@ -96,4 +96,14 @@ describe('CartItem', () => {
 
     expect(button.exists()).toBe(true);
   });
+
+  it('should call cart manager removeProduct() when button gets clicked', async () => {
+    const { wrapper, cartManager, product } = mountCartItem(server);
+    const spy = jest.spyOn(cartManager, 'removeProduct');
+
+    await wrapper.find('[data-testid="remove-button"]').trigger('click');
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(product.id);
+  });
 });
