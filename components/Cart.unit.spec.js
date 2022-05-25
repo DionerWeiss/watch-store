@@ -85,4 +85,20 @@ describe('Cart', () => {
     expect(wrapper.findAllComponents(CartItem)).toHaveLength(2);
     expect(wrapper.text()).not.toContain('Cart is empty');
   });
+
+  it('should display a button to clear cart', () => {
+    const { wrapper } = mountCart();
+    const button = wrapper.find('[data-testid="clear-cart-button"]');
+
+    expect(button.exists()).toBe(true);
+  });
+
+  it('should call cart manager clearProducts() when button gets clicked', async () => {
+    const { wrapper, cartManager } = mountCart(server);
+    const spy = jest.spyOn(cartManager, 'clearProducts');
+
+    await wrapper.find('[data-testid="clear-cart-button"]').trigger('click');
+
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
 });
