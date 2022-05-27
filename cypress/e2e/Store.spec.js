@@ -52,4 +52,28 @@ context('Store', () => {
       cy.get('body').contains('0 Products');
     });
   });
+
+  context('Store > Product List', () => {
+    it('should display "0 Products" when no product is returned', () => {
+      cy.visit('http://localhost:3000');
+      cy.get('[data-testid="product-card"]').should('have.length', 0);
+      cy.get('body').contains('0 Products');
+    });
+
+    it('should display "1 Product" when 1 product is returned', () => {
+      server.create('product');
+
+      cy.visit('http://localhost:3000');
+      cy.get('[data-testid="product-card"]').should('have.length', 1);
+      cy.get('body').contains('1 Product');
+    });
+
+    it('should display "10 Products" when 10 products are returned', () => {
+      server.createList('product', 10);
+
+      cy.visit('http://localhost:3000');
+      cy.get('[data-testid="product-card"]').should('have.length', 10);
+      cy.get('body').contains('10 Products');
+    });
+  });
 });
