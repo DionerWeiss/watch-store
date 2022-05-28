@@ -113,9 +113,7 @@ context('Store', () => {
     });
 
     it('should add 3 products to the cart', () => {
-      gid('product-card').eq(1).find('button').click();
-      gid('product-card').eq(3).find('button').click({ force: true });
-      gid('product-card').eq(5).find('button').click({ force: true });
+      cy.addToCart({ indexes: [1, 3, 5] });
 
       gid('cart-item').should('have.length', 3);
     });
