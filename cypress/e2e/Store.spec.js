@@ -80,8 +80,10 @@ context('Store', () => {
   });
 
   context('Store > Shopping Cart', () => {
+    const quantity = 10;
+
     beforeEach(() => {
-      server.createList('product', 10);
+      server.createList('product', quantity);
       cy.visit('/');
     });
 
@@ -100,6 +102,19 @@ context('Store', () => {
       gid('shopping-cart').should('have.class', 'hidden');
     });
 
+    it('should not display "Clear cart" button when cart is empty', () => {
+      gid('toggle-button').as('toggleButton');
+      g('@toggleButton').click();
+      gid('clear-cart-button').should('not.be.visible');
+    });
+
+    it('should display "Cart is empty" message when there are no products', () => {
+      gid('toggle-button').as('toggleButton');
+      g('@toggleButton').click();
+
+      gid('shopping-cart').contains('Cart is empty');
+    });
+
     it('should open shopping cart when a product is added', () => {
       gid('product-card').first().find('button').click();
 
@@ -116,6 +131,43 @@ context('Store', () => {
       cy.addToCart({ indexes: [1, 3, 5] });
 
       gid('cart-item').should('have.length', 3);
+    });
+
+    it('should add 1 product to the cart', () => {
+      cy.addToCart({ index: 6 });
+
+      gid('cart-item').should('have.length', 1);
+    });
+
+    it('should add all products to the cart', () => {
+      cy.addToCart({ indexes: 'all' });
+
+      gid('cart-item').should('have.length', quantity);
+    });
+
+    it('should display quantity 1 when product is added to cart', () => {
+      cy.addToCart({ index: 1 });
+      gid('quantity').contains(1);
+    });
+
+    it('should remove a product from cart', () => {
+      cy.addToCart({ index: 2 });
+
+      gid('cart-item').as('cartItems');
+
+      g('@cartItems').should('have.length', 1);
+
+      g('@cartItems').first().find('[data-testid="remove-button"]').click();
+
+      g('@cartItems').should('have.length', 0);
+    });
+
+    it('should clear cart when "Clear cart" button is clicked', () => {
+      cy.addToCart({ indexes: [1, 2, 3] });
+
+      gid('cart-item').should('have.length', 3);
+      gid('clear-cart-button').click();
+      gid('cart-item').should('have.length', 0);
     });
   });
 });
